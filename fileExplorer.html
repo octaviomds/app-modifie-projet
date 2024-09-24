@@ -1,0 +1,77 @@
+<!--
+
+have config.xml start with this file to view file system
+
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cordova Download Unzip Display Sample</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <script src="cordova.js"></script>
+
+    <!-- <script src="../scripts/appConfig.js"></script> -->
+    <script type="text/javascript" src="scripts/lib/angular.min.js"></script>
+    <script type="text/javascript" src="scripts/fileExplorer.js"></script>
+    <script type="text/javascript" src="scripts/fileExplorerApp.js"></script>
+    <link rel="stylesheet" href="styles/bootstrap.css" type="text/css">
+
+</head>
+<body>
+<h1>File Explorer</h1>
+
+<div ng-controller="mainCtrl">
+    <button class="btn btn-success" ng-click="fetchWWW(parent)">www</button>
+    <button class="btn btn-warning" ng-show="parent" ng-click="fetch(parent,bind)">&lt;&lt; Back</button>
+    {{timeStamp}}
+    <ul>
+        <li ng-repeat="entry in entries">
+            {{entry.name}} - <span class="btn btn-success" ng-show="entry.isDirectory" ng-click="fetch(entry)" > &gt;&gt;&gt; </span>
+            <span class="btn btn-primary" ng-show="!entry.isDirectory" ng-click="nav(entry)" > nav </span>
+            <br/>
+            <a href="{{entry.toURL()}}" target="_blank"> {{entry.toURL()}} </a>
+        </li>
+    </ul>
+</div>
+
+
+<div id="statusPlace"></div>
+<script type="application/javascript">
+
+    var deviceReady=false;
+
+    var statusPlace = document.getElementById('statusPlace') ;
+
+    var l = console.log;
+    console.log = function (message) {
+        statusPlace.innerHTML += "<br/>" + message;
+        l.apply(console, arguments);
+    };
+
+    var e = console.error;
+    console.error = function (message) {
+        statusPlace.innerHTML += '<br/><span style="color:red">' + message + "</span>";
+        e.apply(console, arguments);
+    };
+
+    var w = console.warn;
+    console.warn = function (message) {
+        statusPlace.innerHTML += '<br/><span style="color:orange">' + message + "</span>";
+        w.apply(console, arguments);
+    };
+
+
+    document.addEventListener("deviceready", function(){
+        deviceReady = true;
+    }, false);
+
+
+
+
+</script>
+</body>
+</html>

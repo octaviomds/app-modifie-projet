@@ -1,0 +1,464 @@
+<html>
+<head>
+    <title>Cordova Download Unzip Display Sample</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src *
+                       'self' 'unsafe-inline' 'unsafe-eval'
+                       127.0.0.1:*
+                       http://*
+                       https://*
+                       gap:
+                       cdvfile://*
+                       data:
+                       blob:
+                       market:
+                       sms:
+                       mailto:
+                       tel:
+                       content://*
+                       ;
+">
+
+
+    <script src="https://dmc1acwvwny3.cloudfront.net/atatus.js"> </script>
+
+    <script src="cordova.js"></script>
+
+    <script src="scripts/appConfig.js"></script>
+    <script src="scripts/contentManager.js"></script>
+    <script src="scripts/cache.js"></script>
+
+    <script>
+
+        function initAtatus() {
+            if(typeof(atatus) != "undefined") {
+                atatus.config('fa0f99a5d1bc4962bc0ad5aa9f911ce9').install();
+                var tags = ['appId:' + appConfig.appId];
+                
+                if (!localStorage.getItem('INSTALL_TRACKED')) {
+                    tags.push('fresh_install');
+                }
+                atatus.setTags(tags);
+            }
+            else
+                setTimeout(initAtatus,1000);
+        }
+
+        initAtatus();
+
+        const performanceLog = {
+            loaderStart: Date.now(),
+            manifestComponentsDownloaded: [],
+            manifestResponseTime: null,
+            connectionType: 'unknown',
+            freshInstall: !localStorage.getItem('INSTALL_TRACKED')
+        };
+
+        setTimeout(() => {
+            if (typeof atatus != 'undefined') {
+                let log = localStorage.getItem('$$performance_log') || performanceLog;
+                atatus.notify(new Error('LOADER: taking longer than usual'), log, ['connectionType:' + performanceLog.connectionType]);
+            }
+        }, 15e3);
+        setTimeout(() => {
+            if (typeof atatus != 'undefined') {
+                let log = localStorage.getItem('$$performance_log') || performanceLog;
+                atatus.notify(new Error('LOADER: taking too long to load'), log, ['connectionType:' + performanceLog.connectionType]);
+            }
+        }, 30e3);
+    </script>
+
+    <style>
+        html {
+            height: 100vh !important;
+        }
+
+        body {
+            background: no-repeat fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            height: 100%;
+            vertical-align: bottom;
+            background-color: black;
+            -webkit-overflow-scrolling: touch;
+            font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
+            font-weight: 100;
+            margin:0px;
+            padding: 0px;
+        }
+
+
+
+        #bottomBar{
+            position: absolute;
+            top:100%;
+            width:100%;
+            margin-top: -130px;
+            background-color: #555;
+            opacity: 0.8;
+            color: #000;
+        }
+
+        .text--line {
+            font-size: 5em;
+        }
+
+        .fluffContainer{
+            position: fixed;
+            bottom:0;
+            width: 100%;
+            height: 25px;
+            text-align: left;
+            margin-top: -25px;
+            background-color: grey;
+            color:white;
+            opacity: 0.2;
+        }
+
+        .percentage {
+            position: absolute;
+            right: 0%;
+            padding-right: 4px;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        #bar {
+            height:5px;
+            background-color: white;
+            width:1%;
+            margin-top: 11px;
+        }
+
+        #fluff {
+            margin-left: 5px;
+            font-size: 13px;
+            position: absolute;
+            margin-top: 4px;
+        }
+
+        /* The Modal (background) */
+        .offline {
+            display: none; /* Hidden by default */
+            font-family: Helvetica, Arial;
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            padding-top: 200px; /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .offline-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: auto;
+            padding: 0;
+            width: 230px;
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 0.4s;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            border-radius: 4px;
+        }
+
+        #downloadContent .offline-content {
+            width:260px;
+        }
+        /* Add Animation */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+
+        .offline-header {
+            padding: 2px 16px;
+            color: black;
+            text-align: center;
+            font-size: 14px;
+            padding-top: 15px;
+            font-weight: 500;
+        }
+
+        .offline-body {
+            padding: 2px 16px;
+            text-align: center;
+            margin-top: 2px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 20px;
+        }
+
+        .offline-progress {
+            padding: 2px 16px;
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .offline-footer {
+            color: black;
+        }
+
+        .clearfix:after{
+            content:'';
+            visibility:hidden;
+            display:block;
+            clear:both;
+            display:block;
+        }
+
+        #offlineNo {
+            border-top: 1px solid #DDD;
+            width: 50%;
+            float: left;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        #offlineYes {
+            border-top: 1px solid #DDD;
+            border-left: 1px solid #DDD;
+            width: 50%;
+            float: right;
+            padding: 10px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 13px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        #offlineCancel {
+            border-top: 1px solid #DDD;
+            width: 100%;
+            float: left;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .offlinePercentage {
+            position: absolute;
+            right: 8px;
+            font-size: 13px;
+            top: -7px;
+        }
+
+        #offlineBar, #offlineTotal {
+            height: 5px;
+            background-color: #DDD;
+            width: 78%;
+            margin: 10px 10px 20px 10px;
+            position: relative;
+            border-radius: 3px;
+        }
+
+        #offlineTotal {
+            background-color: #777;
+            margin: 0px;
+            position: absolute;
+            top: 0px;
+            left:0px;
+            width: 50%;
+            transition: 0.3s all ease-in-out;
+        }
+
+        .progressContainer {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Trigger/Open The Modal -->
+
+<div id="offlineChoice" class="offline">
+
+    <!-- Modal content -->
+    <div class="offline-content">
+        <div class="offline-header">
+            Offline Mode
+        </div>
+        <div class="offline-body">
+            Would you like this app to be available offline?
+        </div>
+        <div class="offline-footer clearfix">
+            <a id="offlineNo">No</a>
+            <a id="offlineYes">Yes</a>
+        </div>
+    </div>
+
+</div>
+
+<div id="downloadContent" class="offline">
+
+    <!-- Modal content -->
+    <div class="offline-content">
+        <div class="offline-header">
+            Downloading Content
+        </div>
+        <div class="offline-body">
+            Please wait. This may take a few minutes based on your connection.
+        </div>
+        <div class="progressContainer">
+            <div id="offlineBar">
+                <div id="offlineTotal"> </div>
+            </div>
+            <span id="offlinePercentage" class="offlinePercentage">50%</span>
+        </div>
+
+        <div class="offline-footer clearfix">
+            <a id="offlineCancel">Cancel</a>
+        </div>
+    </div>
+
+</div>
+
+<div id = "fluffContainer" class = "fluffContainer">
+    <!--
+    <span id="fluff">Making your app awesome</span>
+    <span id="percentage" class="percentage"></span>
+    -->
+    <div id="bar"> </div>
+</div>
+
+<script>
+    // Get the offlineChoice modal
+    var offlineChoice = document.getElementById('offlineChoice');
+    var downloadContent = document.getElementById('downloadContent');
+    // var fluffContainer = document.getElementById('fluffContainer');
+    var offlineNo = document.getElementById("offlineNo");
+    var offlineYes = document.getElementById("offlineYes");
+    var offlineCancel = document.getElementById("offlineCancel");
+
+    offlineCancel.onclick = function() {
+        downloadContent.style.display = "none";
+    };
+
+    /**
+     * Determine the mobile operating system.
+     * This function returns one of 'iOS', 'Android', 'Windows Phone', or 'unknown'.
+     *
+     * @returns {String}
+     */
+
+    document.body.style.backgroundImage = "url(splash/splash-port-xxxhdpi.png)";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundAttachment = "fixed";
+    document.body.style.backgroundPosition = "center";
+
+
+    var tmrThreshold = setTimeout(function(){alert("Device Not Ready");}, 10000);
+
+    function onDeviceReady() {
+
+        clearTimeout(tmrThreshold);
+
+        console.log('contentManager.checkForUpdate()');
+
+        var tmrTimeout = setTimeout(hideSplash, 2500);
+
+        contentManager.checkForUpdate({ performanceLog }, function() {
+            localStorage.setItem('$$performance_log', JSON.stringify(performanceLog));
+
+            clearTimeout(tmrTimeout);
+            contentManager.setProgress(1, 1);
+
+            if (contentManager.debugMode)   console.log("<a href='fileExplorer.html'>File Explorer</a>");
+
+            if (!contentManager.debugMode || confirm("Move on to App?")) {
+                if (navigator.splashscreen) navigator.splashscreen.show();
+                var route = "index.html" + appConfig.compileQueryString();
+                window.location = route;
+            }
+        });
+
+        if(cordova && cordova.plugins && cordova.plugins.notification && cordova.plugins.notification){
+            cordova.plugins.notification.local.on("click", function(notification) {
+                sessionStorage.setItem('notification', JSON.stringify(notification));
+            });
+        }
+    }
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    //For the progress bar at the bottom
+    var percentage= document.getElementById("percentage");
+    var bar= document.getElementById("bar");
+    //For the progress bar on offline content dialog.
+    var offlineTotal= document.getElementById("offlineTotal");
+    var offlinePercentage= document.getElementById("offlinePercentage");
+
+    contentManager.onProgressUpdate = function (percent) {
+        if(percentage) {
+            percentage.innerHTML = percent + "%";
+        }
+        if(bar) {
+            bar.style.width = percent + "%";
+        }
+
+        if(offlinePercentage){
+            offlinePercentage.innerHTML = percent + "%";
+        }
+
+        if(offlineTotal){
+            offlineTotal.style.width = percent +"%";
+        }
+    };
+
+    contentManager.onStatusUpdate = function(msg){
+        console.log(msg);
+    };
+
+    function handleOpenURL(url) {
+        setTimeout(function() {
+            localStorage.setItem('urlSchema',  url);
+        }, 0);
+    }
+
+    function hideSplash(){
+
+        if (navigator && navigator.splashscreen)
+            navigator.splashscreen.hide();
+        else if (window.location.protocol != "http:")
+            alert('cant hide splash screen');
+    }
+
+    var firstDownload = true;
+
+    contentManager.onSubProgressUpdate = function (percent, tag) {
+
+        if (firstDownload)
+            firstDownload = false;
+
+        console.log(tag,percent);
+    };
+
+
+</script>
+</body>
+</html>

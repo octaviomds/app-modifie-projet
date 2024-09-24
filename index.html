@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" version="1.0" >
+<head>
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src *
+                       'self' 'unsafe-inline' 'unsafe-eval'
+                       127.0.0.1:*
+                       http://*
+                       https://*
+                       gap:
+                       cdvfile://*
+                       data:
+                       blob:
+                       market:
+                       sms:
+                       mailto:
+                       tel:
+                       content://*
+                       ;
+">
+
+
+    <base href="./" target="_blank">
+    <meta charset="utf-8">
+    <meta name="description" content="BuildFire App">
+    <meta name="author" content="BuildFire">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>BuildFire App</title>
+    
+        <meta name="bundle-id" content="com.m8b8c6e68eb1.app" />
+        <meta name="release" content="1.0.40" />
+        <meta name="build-time" content="1697735718011" />
+        <meta name="build-version" content="6.3.0" />
+        <meta name="url-schema" content="app8b8c6e" />
+        
+    <script>
+        localStorage.setItem('$$index_page_start', Date.now());
+        var log = localStorage.getItem('launchLog');
+        localStorage.setItem('launchLog',log + '\rIndex start: ' +  (Math.round(Date.now()/1000) + "").substring(6) );
+        localStorage.setItem("geo-declaration-required",  "true");
+
+        function handleOpenURL(url) {
+            window._shareLinkURL = url;
+        }
+
+				window.appLoadTimeouts = [
+					setTimeout(() => {
+						if (typeof atatus != 'undefined') {
+							let perfLog = localStorage.getItem('$$performance_log');
+							atatus.notify(new Error('INDEX: taking too long to load'), perfLog, []);
+						}
+					}, 15e3),
+					setTimeout(() => {
+						if (typeof atatus != 'undefined') {
+							let perfLog = localStorage.getItem('$$performance_log');
+							atatus.notify(new Error('INDEX: failed to load'), perfLog, []);
+						}
+					}, 30e3)
+				];
+    </script>
+     <style>
+        body.splash {
+            background-image: url('splash/splash-port-xxxhdpi.png') !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            -webkit-background-size: cover !important;
+            -moz-background-size: cover !important;
+            -o-background-size: cover !important;
+            background-size: cover !important;
+        }
+        body.splash #appBody {
+            visibility: hidden;
+        }
+        body.splash #login {
+            visibility: hidden;
+        }
+        body.splash #footerMenu {
+            visibility: hidden;
+        }
+        body.splash #menu {
+            visibility: hidden;
+        }
+        body.splash #popup {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<!----------------------------------------------------------------------
+    Copy of app/index.html just change the path of appResource.js to use CDVFile
+---------------------------------------------------------------------->
+<body>
+
+<style>
+    html,body{positon:fixed;overflow-x: hidden;}
+</style>
+<script type="text/javascript" src="cordova.js" ></script>
+<script type="text/javascript">
+
+     document.addEventListener("deviceready", function() {
+        window._appRoot = `${cordova.file.applicationStorageDirectory}files/files/app/`;
+
+        var scriptTag = document.createElement("script");
+        scriptTag.src = _appRoot + "appResources.js";
+        scriptTag.setAttribute('onerror', "gotoLoader();");
+        document.body.appendChild(scriptTag);
+        window.navigator.splashscreen.show = function() {
+            document.body.classList.add('splash');
+        };
+        let cordovaHideSplash = window.navigator.splashscreen.hide;
+        window.navigator.splashscreen.hide = function() {
+            document.body.classList.remove('splash');
+            cordovaHideSplash();
+        };
+     });
+
+     document.body.classList.add('splash');
+    function gotoLoader(){
+        localStorage.removeItem('currentAppManifest');
+        localStorage.removeItem('askedUserOffline');
+        window.location = 'loader.html' + window.location.search;
+    }
+</script>
+</body>
+</html>
